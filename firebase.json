@@ -1,0 +1,42 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "urban-patrol-652af",
+          "appId": "1:511352446547:android:7ed130d293b5ebb43bb0a6",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "urban-patrol-652af",
+          "configurations": {
+            "android": "1:511352446547:android:7ed130d293b5ebb43bb0a6",
+            "ios": "1:511352446547:ios:6c98b4f40f2444db3bb0a6",
+            "macos": "1:511352446547:ios:6c98b4f40f2444db3bb0a6",
+            "web": "1:511352446547:web:7722e5e332a735c73bb0a6",
+            "windows": "1:511352446547:web:da7211e3b5d7e6bb3bb0a6"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}

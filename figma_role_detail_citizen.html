@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Role - UrbanPatrol</title>
+  <style>
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:#f4f7fb;color:#0f172a}
+    .page{max-width:1200px;margin:0 auto;padding:24px}
+    h1{margin:0 0 8px;font-size:30px}
+    .desc{color:#64748b;margin-bottom:20px}
+    .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+    .panel{background:white;border-radius:24px;padding:20px;box-shadow:0 16px 35px rgba(15,23,42,.08)}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .pill{padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#dbeafe;color:#1d4ed8}
+    .phone{border:12px solid #0f172a;border-radius:32px;overflow:hidden;max-width:320px;margin:0 auto;background:#e2e8f0}
+    .screen{background:linear-gradient(180deg,#ffffff,#f8fafc);padding:14px}
+    .hero{background:linear-gradient(135deg,#2563eb,#60a5fa);color:white;padding:14px;border-radius:16px;margin-bottom:12px}
+    .card{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;border:1px solid #e2e8f0}
+    .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .btn{width:100%;padding:11px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:700}
+    .muted{font-size:12px;color:#64748b}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .item{display:flex;gap:10px;padding:10px;border:1px solid #e2e8f0;border-radius:12px;background:#fafafa}
+    .dot{width:10px;height:10px;border-radius:50%;background:#10b981;margin-top:6px}
+    .step{margin-bottom:8px;padding:10px;border-left:4px solid #2563eb;background:#f8fbff;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Role 1: Citizen</h1>
+    <div class="desc">Mô phỏng đầy đủ hoạt động của người dân: chụp ảnh, lấy GPS, gửi báo cáo, theo dõi trạng thái.</div>
+    <div class="wrap">
+      <div class="panel">
+        <div class="top"><strong>Mockup giao diện</strong><span class="pill">Citizen Flow</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="hero">
+              <h3>Báo cáo sự cố đô thị</h3>
+              <div class="muted" style="color:white">Chụp ảnh, lấy GPS và gửi ngay tại hiện trường</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Ảnh hiện trường</strong><span class="pill" style="background:#dcfce7;color:#166534">Đã chụp</span></div>
+              <div style="height:90px;background:linear-gradient(135deg,#dbeafe,#eff6ff);border-radius:12px"></div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Vị trí GPS</strong><span class="pill" style="background:#dcfce7;color:#166534">GPS OK</span></div>
+              <div class="muted">21.0285, 105.8048</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Loại sự cố</strong></div>
+              <div class="muted">Hố ga · Đèn đường · Cây đổ · Ngập nước · Khác</div>
+            </div>
+            <button class="btn">Gửi báo cáo</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="top"><strong>Chức năng đầy đủ</strong><span class="pill">MVP</span></div>
+        <div class="step">1. Chụp ảnh trực tiếp bằng camera, không chọn ảnh từ thư viện.</div>
+        <div class="step">2. Tự động lấy GPS độ chính xác cao và hiển thị tọa độ.</div>
+        <div class="step">3. Nhập mô tả và chọn loại sự cố.</div>
+        <div class="step">4. Gửi tới Firestore, lưu ảnh + hash + metadata.</div>
+        <div class="step">5. Xem danh sách “Sự cố của tôi” và theo dõi trạng thái.</div>
+        <div class="step">6. Nhận thông báo khi trạng thái thay đổi.</div>
+        <div class="list" style="margin-top:12px">
+          <div class="item"><div class="dot"></div><div><strong>Reported</strong><div class="muted">Báo cáo đã được nhận</div></div></div>
+          <div class="item"><div class="dot"></div><div><strong>Assigned</strong><div class="muted">Đã phân công cho công nhân</div></div></div>
+          <div class="item"><div class="dot"></div><div><strong>Closed</strong><div class="muted">Đã xử lý xong</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

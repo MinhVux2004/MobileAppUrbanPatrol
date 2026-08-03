@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worker Role - UrbanPatrol</title>
+  <style>
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:#f4f7fb;color:#0f172a}
+    .page{max-width:1200px;margin:0 auto;padding:24px}
+    h1{margin:0 0 8px;font-size:30px}
+    .desc{color:#64748b;margin-bottom:20px}
+    .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+    .panel{background:white;border-radius:24px;padding:20px;box-shadow:0 16px 35px rgba(15,23,42,.08)}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .pill{padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#dcfce7;color:#166534}
+    .phone{border:12px solid #0f172a;border-radius:32px;overflow:hidden;max-width:320px;margin:0 auto;background:#e2e8f0}
+    .screen{background:linear-gradient(180deg,#ffffff,#f8fafc);padding:14px}
+    .hero{background:linear-gradient(135deg,#10b981,#34d399);color:white;padding:14px;border-radius:16px;margin-bottom:12px}
+    .card{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;border:1px solid #e2e8f0}
+    .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .btn{width:100%;padding:11px;border:none;border-radius:12px;background:#10b981;color:#fff;font-weight:700}
+    .muted{font-size:12px;color:#64748b}
+    .step{margin-bottom:8px;padding:10px;border-left:4px solid #10b981;background:#f8fffb;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Role 2: Worker</h1>
+    <div class="desc">Mô phỏng đầy đủ hoạt động của công nhân bảo trì: nhận việc, bắt đầu xử lý, gửi ảnh hoàn thành, chờ admin duyệt.</div>
+    <div class="wrap">
+      <div class="panel">
+        <div class="top"><strong>Mockup giao diện</strong><span class="pill">Worker Flow</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="hero">
+              <h3>Nhiệm vụ được giao</h3>
+              <div class="muted" style="color:white">Bạn có 2 sự cố cần xử lý hôm nay</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Hố ga mất nắp</strong><span class="pill">Đã phân công</span></div>
+              <div class="muted">Địa chỉ: Trần Duy Hưng · SLA 6h</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Đèn đường hỏng</strong><span class="pill">Đang xử lý</span></div>
+              <div class="muted">Đang đi tới hiện trường</div>
+            </div>
+            <button class="btn">Hoàn thành & gửi nghiệm thu</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="top"><strong>Chức năng đầy đủ</strong><span class="pill">Worker Actions</span></div>
+        <div class="step">1. Xem danh sách sự cố được phân công cho mình.</div>
+        <div class="step">2. Chuyển trạng thái từ Assigned → In Progress.</div>
+        <div class="step">3. Chụp ảnh hoàn thành sau khi sửa.</div>
+        <div class="step">4. Gửi ảnh minh chứng cho admin duyệt.</div>
+        <div class="step">5. Chờ trạng thái Pending Review hoặc Closed.</div>
+        <div class="step">6. Nhận thông báo khi admin phân công việc hoặc phê duyệt.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

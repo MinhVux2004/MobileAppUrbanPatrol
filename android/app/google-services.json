@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "511352446547",
+    "project_id": "urban-patrol-652af",
+    "storage_bucket": "urban-patrol-652af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511352446547:android:7ed130d293b5ebb43bb0a6",
+        "android_client_info": {
+          "package_name": "com.example.urban_patrol_btl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfeXAoNIkBah9MAcPqPB1i1pHriaXuR2w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

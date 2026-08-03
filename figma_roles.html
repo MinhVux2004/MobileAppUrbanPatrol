@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UrbanPatrol - Figma Style by Role</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --blue:#2563eb;
+      --dark:#0f172a;
+      --muted:#64748b;
+      --green:#10b981;
+      --orange:#f59e0b;
+      --pink:#ec4899;
+    }
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:var(--bg);color:var(--dark)}
+    .page{max-width:1400px;margin:0 auto;padding:24px}
+    h1{margin:0 0 8px;font-size:32px}
+    .sub{color:var(--muted);margin-bottom:24px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .role-card{background:var(--card);border-radius:24px;padding:20px;box-shadow:0 16px 35px rgba(15,23,42,.08)}
+    .role-title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;margin-bottom:12px}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .citizen{background:#dbeafe;color:#1d4ed8}.worker{background:#dcfce7;color:#166534}.admin{background:#fce7f3;color:#be185d}
+    .phone{margin:12px auto 0;border:12px solid #0f172a;border-radius:28px;overflow:hidden;background:#f8fafc;max-width:280px;box-shadow:0 14px 35px rgba(0,0,0,.18)}
+    .screen{background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);padding:12px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 0 12px}
+    .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#60a5fa);display:grid;place-items:center;color:white;font-weight:700}
+    .hero{background:linear-gradient(135deg,var(--blue),#60a5fa);color:white;padding:12px;border-radius:16px;margin-bottom:10px}
+    .hero h3{margin:4px 0;font-size:16px}
+    .hero p{margin:0;font-size:12px;opacity:.95}
+    .card{background:white;border-radius:14px;padding:10px;margin-bottom:10px;box-shadow:0 4px 12px rgba(15,23,42,.05)}
+    .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+    .badge{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}
+    .btn{display:block;width:100%;border:none;border-radius:12px;padding:10px 12px;font-weight:700;color:white;background:var(--blue);cursor:pointer}
+    .btn.green{background:var(--green)}
+    .btn.orange{background:var(--orange)}
+    .small{font-size:12px;color:var(--muted)}
+    .dots{display:flex;gap:6px;justify-content:center;margin-top:8px}
+    .dot{width:7px;height:7px;border-radius:50%;background:#cbd5e1}
+    .dot.active{background:var(--blue)}
+    @media (max-width:1100px){.grid{grid-template-columns:1fr;}} 
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>UrbanPatrol – Figma-style UI cho từng role</h1>
+    <div class="sub">Bản mockup này dùng để tham khảo giao diện cho Citizen, Worker và Admin.</div>
+    <div class="grid">
+      <div class="role-card">
+        <div class="role-title"><span class="pill citizen">Citizen</span> Người dân</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="topbar">
+              <div><strong>UrbanPatrol</strong><div class="small">Báo cáo sự cố</div></div>
+              <div class="avatar">C</div>
+            </div>
+            <div class="hero">
+              <h3>Báo cáo sự cố ngay</h3>
+              <p>Chụp ảnh, lấy GPS, gửi báo cáo trong vài giây</p>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Ảnh hiện trường</strong><span class="badge citizen">Đã chụp</span></div>
+              <div style="height:70px;background:linear-gradient(135deg,#dbeafe,#eff6ff);border-radius:12px"></div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Vị trí</strong><span class="badge citizen">GPS OK</span></div>
+              <div class="small">21.0285, 105.8048</div>
+            </div>
+            <button class="btn">Gửi phản ánh</button>
+            <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-title"><span class="pill worker">Worker</span> Công nhân</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="topbar">
+              <div><strong>Nhiệm vụ</strong><div class="small">Được giao cho bạn</div></div>
+              <div class="avatar">W</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Hố ga mất nắp</strong><span class="badge orange">Đang xử lý</span></div>
+              <div class="small">Địa chỉ: Phố Trần Duy Hưng</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Tiến độ</strong><span class="badge worker">Bắt đầu xử lý</span></div>
+              <div class="small">Chụp ảnh hoàn thành và gửi nghiệm thu</div>
+            </div>
+            <button class="btn green">Hoàn thành & gửi nghiệm thu</button>
+            <div class="dots"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-title"><span class="pill admin">Admin</span> Quản trị</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="topbar">
+              <div><strong>Dashboard</strong><div class="small">Quản lý sự cố</div></div>
+              <div class="avatar">A</div>
+            </div>
+            <div class="hero" style="background:linear-gradient(135deg,#ec4899,#f472b6)">
+              <h3>3 sự cố cần xử lý</h3>
+              <p>Phân công, duyệt và theo dõi SLA</p>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Đèn đường hỏng</strong><span class="badge orange">Chờ phân công</span></div>
+              <div class="small">SLA: 24 giờ còn lại</div>
+            </div>
+            <div class="card">
+              <div class="row"><strong>Ngập nước</strong><span class="badge admin">Chờ duyệt</span></div>
+              <div class="small">Ảnh hoàn thành đã được gửi</div>
+            </div>
+            <button class="btn orange">Phân công & kiểm duyệt</button>
+            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot active"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
