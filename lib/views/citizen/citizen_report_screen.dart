@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.h';
 
 class CitizenReportScreen extends StatefulWidget {
   const CitizenReportScreen({super.key});
@@ -106,7 +107,7 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
       if (!mounted) return;
       setState(() {
         _currentPosition = position;
-        _addressStatus = "Lat: ${position.latitude.toStringAsFixed(6)}, Lng: ${position.longitude.toStringAsFixed(6)}";
+        _addressStatus = "Lat: ${position.latitude.toStringAsFixed(6)}, Lng:${position.longitude.toStringAsFixed(6)}";
         _isLoading = false;
       });
     } catch (e) {
@@ -203,7 +204,7 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Khu vực hiển thị ảnh hiện trường
+            // Khu vực hiển thị ảnh hiện trường (Đã xử lý an toàn cho Web & Mobile)
             InkWell(
               onTap: _captureImageFromCamera,
               borderRadius: BorderRadius.circular(16),
@@ -224,7 +225,15 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
                 child: _imageFile != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: Image.file(_imageFile!, fit: BoxFit.cover),
+                        child: kIsWeb
+                            ? Image.network(
+                                _imageFile!.path,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.file(
+                                _imageFile!,
+                                fit: BoxFit.cover,
+                              ),
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
