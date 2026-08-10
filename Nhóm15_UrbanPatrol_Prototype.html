@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UrbanPatrol - Multi-Role Prototype Viewer</title>
+    <style>
+      :root {
+        --white: #ffffff;
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --border: #cbd5e1;
+        --text: #0f172a;
+        --muted: #475569;
+        --muted-light: #64748b;
+        --accent: #2563eb;
+        --accent-dark: #1d4ed8;
+        --danger: #dc2626;
+        --success: #16a34a;
+        --warning: #d97706;
+        --shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+        background: #e2e8f0;
+        color: var(--text);
+      }
+      .viewer {
+        display: grid;
+        grid-template-columns: 300px 1fr 320px;
+        gap: 16px;
+        padding: 18px;
+      }
+      .panel,
+      .properties {
+        background: #ffffff;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 24px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+        height: fit-content;
+        max-height: calc(100vh - 36px);
+        overflow-y: auto;
+      }
+      .panel h2,
+      .properties h2 {
+        margin: 0 0 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted-light);
+      }
+      .role-group {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 14px 0 6px 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .tab-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-radius: 14px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        border: 1px solid transparent;
+      }
+      .tab-item:hover,
+      .tab-item.active {
+        background: rgba(37, 99, 235, 0.08);
+        border-color: rgba(37, 99, 235, 0.17);
+      }
+      .tab-item span {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .canvas {
+        background: #e5e7eb;
+        border-radius: 32px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        min-height: calc(100vh - 48px);
+        display: flex;
+        justify-content: center;
+      }
+      .device {
+        width: 380px;
+        background: #ffffff;
+        border-radius: 36px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .device-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        background: #ffffff;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      }
+      .device-header h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .device-body {
+        flex: 1;
+        position: relative;
+        background: #f8fafc;
+        overflow-y: auto;
+        padding-bottom: 70px;
+      }
+      .screen {
+        position: absolute;
+        inset: 0;
+        padding: 16px;
+        overflow-y: auto;
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .field label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .field input, .field textarea, .field select {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 12px 14px;
+        font-size: 14px;
+        font-family: inherit;
+        background: #fff;
+      }
+      .button {
+        width: 100%;
+        height: 46px;
+        border: none;
+        border-radius: 12px;
+        background: var(--accent);
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .button:hover {
+        background: var(--accent-dark);
+      }
+      .text-link {
+        width: 100%;
+        text-align: center;
+        margin-top: 14px;
+        color: var(--accent-dark);
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .badge-pending { color: #c2410c; background: #ffedd5; }
+      .badge-progress { color: #1d4ed8; background: #dbeafe; }
+      .badge-done { color: #15803d; background: #dcfce7; }
+      .list-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        margin-bottom: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .list-thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: #bbf7d0;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        font-size: 22px;
+      }
+      .list-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .bottom-nav {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: #ffffff;
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 10;
+      }
+      .bottom-item {
+        display: flex;
+       flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--muted-light);
+        cursor: pointer;
+        background: none;
+        border: none;
+      }
+      .bottom-item.active {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .map-container {
+        width: 100%;
+        height: 100%;
+        background: #cbd5e1;
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        min-height: 520px;
+      }
+      .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewer">
+      <div class="panel">
+        <h2>Hệ thống UrbanPatrol</h2>
+        <div class="role-group">👤 Role: Người dân</div>
+        <div class="tab-item active" data-screen="login"><span>Đăng nhập</span><span>Auth</span></div>
+        <div class="tab-item" data-screen="register"><span>Đăng ký tài khoản</span><span>Auth</span></div>
+        <div class="tab-item" data-screen="submit"><span>Gửi phản ảnh mới</span><span>Tab 1</span></div>
+        <div class="tab-item" data-screen="camera"><span>Chụp ảnh hiện trường</span><span>Sub</span></div>
+        <div class="tab-item" data-screen="list"><span>Danh sách phản ảnh</span><span>Tab 2</span></div>
+        <div class="tab-item" data-screen="map"><span>Bản đồ sự cố</span><span>Tab 3</span></div>
+        <div class="role-group">🛡️ Role: Cán bộ xử lý</div>
+        <div class="tab-item" data-screen="officer-tasks"><span>Nhiệm vụ được giao</span><span>Task</span></div>
+        <div class="tab-item" data-screen="officer-detail"><span>Cập nhật tiến độ xử lý</span><span>Action</span></div>
+        <div class="role-group">👑 Role: Quản trị viên</div>
+        <div class="tab-item" data-screen="admin-dash"><span>Thống kê & Dashboard</span><span>Admin</span></div>
+        <div class="tab-item" data-screen="admin-users"><span>Quản lý phân quyền</span><span>Admin</span></div>
+      </div>
+      <div class="canvas">
+        <div class="device">
+          <div class="device-header">
+            <h3 id="deviceTitle">Đăng nhập hệ thống</h3>
+            <span style="font-size: 15px; cursor: pointer;" title="Đăng xuất" onclick="switchScreen('login')">🚪</span>
+          </div>
+          <div class="device-body">
+            <div class="screen active" id="screen-login">
+              <div style="display: flex; flex-direction: column; justify-content: center; min-height: 100%; padding: 10px 0;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                  <div style="display: inline-flex; width: 64px; height: 64px; background: #eff6ff; border-radius: 20px; align-items: center; justify-content: center; color: var(--accent); font-size: 28px;">🏢</div>
+                  <p style="font-size: 17px; font-weight: 700; margin-top: 12px;">UrbanPatrol Login</p>
+                </div>
+                <div class="field"><label>Email đăng nhập</label><input type="email" id="loginEmail" value="citizen@urbanpatrol.vn"></div>
+                <div class="field"><label>Mật khẩu</label><input type="password" value="123456"></div>
+                <div class="field">
+                  <label>Chọn nhanh phân quyền test</label>
+                  <select id="roleSelector" onchange="changeRolePreset(this.value)">
+                    <option value="citizen">Vai trò: Người dân</option>
+                    <option value="officer">Vai trò: Cán bộ xử lý</option>
+                    <option value="admin">Vai trò: Quản trị viên</option>
+                  </select>
+                </div>
+                <button class="button" onclick="performLogin()">Đăng nhập hệ thống</button>
+                <div class="text-link" onclick="switchScreen('register')">Chưa có tài khoản? Đăng ký ngay</div>
+              </div>
+            </div>
+            <div class="screen" id="screen-register">
+              <div style="display: flex; flex-direction: column; justify-content: center; min-height: 100%; padding: 10px 0;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; cursor: pointer;" onclick="switchScreen('login')">
+                  <span style="font-size: 18px;">←</span>
+                  <p style="font-size: 16px; font-weight: 700; margin: 0;">Đăng ký tài khoản</p>
+                </div>
+                <div class="field"><label>Họ và tên</label><input type="text" placeholder="Nguyễn Văn A"></div>
+                <div class="field"><label>Email</label><input type="email" placeholder="email@domain.com"></div>
+                <div class="field"><label>Mật khẩu</label><input type="password" placeholder="••••••"></div>
+                <button class="button" onclick="alert('Đăng ký thành công!'); switchScreen('login');">Đăng ký tài khoản</button>
+              </div>
+            </div>
+            <div class="screen" id="screen-submit">
+              <p style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Báo cáo sự cố đô thị</p>
+              <div id="uploadBox" style="height: 120px; border: 2px dashed #93c5fd; border-radius: 16px; background: #f0fdf4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; margin-bottom: 12px; cursor: pointer;" onclick="switchScreen('camera')">
+                <span style="font-size: 24px;">📷</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--accent);">Chạm để chụp ảnh hiện trường</span>
+                <span style="font-size: 10px; color: var(--muted-light);">(Tự động đính kèm GPS)</span>
+              </div>
+              <div style="background: #fff; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                <span style="font-size: 18px;">📍</span>
+                <div>
+                  <div style="font-size: 10px; color: var(--muted-light);">Tọa độ hiện trường thực tế</div>
+                  <div style="font-size: 12px; font-weight: 700;">21.0063, 105.8261 (Hà Nội)</div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Mô tả chi tiết sự cố</label>
+                <textarea rows="2" placeholder="Ví dụ: Ổ gà lớn, ngập úng..." style="resize: none;"></textarea>
+              </div>
+              <button class="button" onclick="alert('Gửi phản ảnh thành công!'); switchScreen('list');">GỬI PHẢN ÁNH NGAY</button>
+            </div>
+            <div class="screen" id="screen-camera" style="padding: 0; background: #000;">
+              <div style="display: flex; flex-direction: column; height: 100%; color: #fff; position: relative;">
+                <div style="padding: 14px; display: flex; justify-content: space-between; align-items: center; z-index: 5; background: rgba(0,0,0,0.4);">
+                  <span style="cursor: pointer; font-size: 18px;" onclick="switchScreen('submit')">✕</span>
+                  <span style="font-size: 13px; font-weight: 600;">Camera Hiện Trường</span>
+                  <span style="font-size: 14px;">⚡</span>
+                </div>
+                <div style="flex: 1; display: grid; place-items: center; background: #1e293b; position: relative;">
+                  <div style="position: absolute; inset: 16px; border: 1px dashed rgba(255,255,255,0.4); border-radius: 12px; pointer-events: none;"></div>
+                  <div style="text-align: center;">
+                    <span style="font-size: 40px;">📷</span>
+                    <p style="font-size: 12px; color: #94a3b8; margin-top: 6px;">Căn chỉnh góc chụp sự cố</p>
+                  </div>
+                  <div style="position: absolute; bottom: 12px; font-size: 10px; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 99px; color: #e2e8f0;">📍 GPS: 21.0063, 105.8261</div>
+                </div>
+                <div style="padding: 20px; display: flex; justify-content: center; align-items: center; background: #000;">
+                  <div onclick="capturePhoto()" style="width: 64px; height: 64px; border-radius: 50%; background: #fff; border: 4px solid #64748b; cursor: pointer; display: grid; place-items: center;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #fff; border: 2px solid #000;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="screen" id="screen-list">
+              <p style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Danh sách phản ảnh</p>           
+              <div class="list-card">
+                <div class="list-thumb" style="background: #fee2e2;">🚰</div>
+                <div class="list-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: 700;">Vỡ ống nước sạch</span>
+                    <span class="status-badge badge-pending">Chờ xử lý</span>
+                  </div>
+                  <span style="font-size: 11px; color: var(--muted-light);">📍 21.0063, 105.8261</span>
+                </div>
+              </div>
+              <div class="list-card">
+                <div class="list-thumb" style="background: #dbeafe;">💡</div>
+                <div class="list-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: 700;">Hỏng đèn chiếu sáng</span>
+                    <span class="status-badge badge-progress">Đang xử lý</span>
+                  </div>
+                  <span style="font-size: 11px; color: var(--muted-light);">📍 21.0120, 105.8410</span>
+                </div>
+              </div>
+              <div class="list-card">
+                <div class="list-thumb" style="background: #dcfce7;">🌳</div>
+                <div class="list-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: 700;">Cây xanh gãy đổ</span>
+                    <span class="status-badge badge-done">Hoàn thành</span>
+                  </div>
+                  <span style="font-size: 11px; color: var(--muted-light);">📍 20.9850, 105.8120</span>
+                </div>
+              </div>
+            </div>
+            <div class="screen" id="screen-map">
+              <div class="map-container">
+                <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, #dbeafe, #f1f5f9); display: grid; place-items: center; color: var(--muted-light); font-size: 12px;">[Bản đồ tọa độ sự cố đô thị]</div>
+                <div style="position: absolute; top: 160px; left: 120px; font-size: 24px; cursor: pointer;" title="Sự cố chờ xử lý">📍</div>
+                <div style="position: absolute; top: 280px; left: 200px; font-size: 24px; cursor: pointer;" title="Sự cố đang xử lý">📍</div>
+              </div>
+            </div>
+            <div class="screen" id="screen-officer-tasks">
+              <p style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Nhiệm vụ tuần tra / xử lý</p>
+              <div class="list-card" onclick="switchScreen('officer-detail')" style="cursor: pointer;">
+                <div class="list-thumb" style="background: #fef3c7;">⚠️</div>
+                <div class="list-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: 700;">Ổ gà khu vực ngã tư</span>
+                    <span class="status-badge badge-progress">Được giao</span>
+                  </div>
+                  <span style="font-size: 11px; color: var(--muted-light);">Hạn chót: Hôm nay, 17:00</span>
+                </div>
+              </div>
+              <div class="list-card" onclick="switchScreen('officer-detail')" style="cursor: pointer;">
+                <div class="list-thumb" style="background: #ffedd5;">🚯</div>
+                <div class="list-content">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; font-weight: 700;">Điểm tập kết rác sai quy định</span>
+                    <span class="status-badge badge-pending">Chờ nhận</span>
+                  </div>
+                  <span style="font-size: 11px; color: var(--muted-light);">Hạn chót: Ngày mai</span>
+                </div>
+              </div>
+            </div>
+            <div class="screen" id="screen-officer-detail">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; cursor: pointer;" onclick="switchScreen('officer-tasks')">
+                <span style="font-size: 16px;">←</span>
+                <p style="font-size: 15px; font-weight: 700; margin: 0;">Xử lý sự cố #UP-9021</p>
+              </div>
+              <div style="background: #e2e8f0; height: 130px; border-radius: 12px; display: grid; place-items: center; font-size: 12px; color: var(--muted-light); margin-bottom: 12px;">[Hình ảnh thực tế từ người dân]</div>
+              <div class="field">
+                <label>Cập nhật trạng thái công việc</label>
+                <select>
+                  <option>Đang tiến hành khắc phục</option>
+                  <option>Đã xử lý xong (Cần nghiệm thu)</option>
+                  <option>Không đủ điều kiện xử lý</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Ghi chú kết quả hiện trường</label>
+                <textarea rows="2" placeholder="Nhập biên bản hoặc ghi chú..." style="resize: none;"></textarea>
+              </div>
+              <button class="button" onclick="alert('Đã cập nhật trạng thái thành công!'); switchScreen('officer-tasks');">LƯU VÀ GỬI BÁO CÁO</button>
+            </div>
+            <div class="screen" id="screen-admin-dash">
+              <p style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Tổng quan hệ thống (Admin)</p>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div class="stat-card" style="margin: 0; text-align: center;">
+                  <div style="font-size: 20px; font-weight: 700; color: var(--accent);">1,248</div>
+                  <div style="font-size: 11px; color: var(--muted-light);">Tổng phản ảnh</div>
+                </div>
+                <div class="stat-card" style="margin: 0; text-align: center;">
+                  <div style="font-size: 20px; font-weight: 700; color: var(--success);">982</div>
+                  <div style="font-size: 11px; color: var(--muted-light);">Đã hoàn thành</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <p style="font-weight: 700; margin: 0 0 6px; font-size: 13px;">Hiệu suất xử lý theo quận</p>
+                <div style="font-size: 12px; color: var(--muted-light); display: flex; flex-direction: column; gap: 4px;">
+                  <div>• Quận Ba Đình: 94%</div>
+                  <div>• Quận Đống Đa: 89%</div>
+                  <div>• Quận Hai Bà Trưng: 92%</div>
+                </div>
+              </div>
+            </div>
+            <div class="screen" id="screen-admin-users">
+              <p style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Phân quyền người dùng</p>
+              <div class="list-card">
+                <div class="list-thumb" style="background: #dbeafe; font-size: 16px;">👑</div>
+                <div class="list-content">
+                  <span style="font-size: 13px; font-weight: 700;">Admin Hệ Thống</span>
+                  <span style="font-size: 11px; color: var(--muted-light);">admin@urbanpatrol.vn</span>
+                </div>
+              </div>
+              <div class="list-card">
+                <div class="list-thumb" style="background: #fef3c7; font-size: 16px;">🛡️</div>
+                <div class="list-content">
+                  <span style="font-size: 13px; font-weight: 700;">Cán bộ Đội Quản lý số 1</span>
+                  <span style="font-size: 11px; color: var(--muted-light);">officer1@urbanpatrol.vn</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav" id="bottomNav">
+            <button class="bottom-item active" onclick="switchScreen('submit')">
+              <span style="font-size: 16px;">📷</span>
+              <span>Gửi phản ảnh</span>
+            </button>
+            <button class="bottom-item" onclick="switchScreen('list')">
+              <span style="font-size: 16px;">📋</span>
+              <span>Danh sách</span>
+            </button>
+            <button class="bottom-item" onclick="switchScreen('map')">
+              <span style="font-size: 16px;">🗺️</span>
+              <span>Bản đồ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="properties">
+        <h2>Thông số kỹ thuật</h2>
+        <div style="display: grid; gap: 12px; font-size: 13px;">
+          <div>
+            <p style="font-weight: 700; margin: 0 0 2px;">Dự án</p>
+            <p style="margin: 0; color: var(--muted-light);">UrbanPatrol - Multi-Role Platform</p>
+          </div>
+          <div>
+            <p style="font-weight: 700; margin: 0 0 2px;">Phân quyền hệ thống</p>
+            <p style="margin: 0; color: var(--muted-light);">1. Người dân (Mobile App)<br>2. Cán bộ (Field Task)<br>3. Quản trị viên (Dashboard)</p>
+          </div>
+          <div>
+            <p style="font-weight: 700; margin: 0 0 2px;">Tính năng cốt lõi</p>
+            <p style="margin: 0; color: var(--muted-light);">Xác thực JWT, Chụp ảnh đính kèm GPS thời gian thực, Phân phối task tự động.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function switchScreen(screenId) {
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+        const targetScreen = document.getElementById(`screen-${screenId}`);
+        if(targetScreen) targetScreen.classList.add('active');
+        const tabItems = document.querySelectorAll('.tab-item');
+        tabItems.forEach(t => {
+          if(t.dataset.screen === screenId) {
+            t.classList.add('active');
+          } else {
+            t.classList.remove('active');
+          }
+        });
+        const titles = {
+          'login': 'Đăng nhập hệ thống',
+          'register': 'Đăng ký tài khoản',
+          'submit': 'Gửi phản ảnh đô thị',
+          'camera': 'Camera hiện trường',
+          'list': 'Danh sách phản ảnh',
+          'map': 'Bản đồ sự cố',
+          'officer-tasks': 'Nhiệm vụ cán bộ',
+          'officer-detail': 'Cập nhật tiến độ xử lý',
+          'admin-dash': 'Dashboard Thống kê',
+          'admin-users': 'Quản lý phân quyền'
+        };
+        document.getElementById('deviceTitle').innerText = titles[screenId] || 'UrbanPatrol';
+        const bottomNav = document.getElementById('bottomNav');
+        const citizenScreens = ['submit', 'list', 'map'];
+        if(citizenScreens.includes(screenId)) {
+          bottomNav.style.display = 'flex';
+          const bottomItems = bottomNav.querySelectorAll('.bottom-item');
+          bottomItems.forEach((item, index) => {
+            item.classList.remove('active');
+            if(screenId === 'submit' && index === 0) item.classList.add('active');
+            if(screenId === 'list' && index === 1) item.classList.add('active');
+            if(screenId === 'map' && index === 2) item.classList.add('active');
+          });
+        } else {
+          bottomNav.style.display = 'none';
+        }
+      }
+      function changeRolePreset(role) {
+        const emailInput = document.getElementById('loginEmail');
+        if(role === 'citizen') emailInput.value = 'citizen@urbanpatrol.vn';
+        if(role === 'officer') emailInput.value = 'officer@urbanpatrol.vn';
+        if(role === 'admin') emailInput.value = 'admin@urbanpatrol.vn';
+      }
+      function performLogin() {
+        const email = document.getElementById('loginEmail').value;
+        if(email.includes('officer')) {
+          switchScreen('officer-tasks');
+        } else if(email.includes('admin')) {
+          switchScreen('admin-dash');
+        } else {
+          switchScreen('submit');
+        }
+      }
+      function capturePhoto() {
+        const uploadBox = document.getElementById('uploadBox');
+        if(uploadBox) {
+          uploadBox.style.background = '#dcfce7';
+          uploadBox.style.borderColor = '#16a34a';
+          uploadBox.innerHTML = `
+            <span style="font-size: 24px;">✅</span>
+            <span style="font-size: 13px; font-weight: 700; color: #166534;">Đã chụp ảnh hiện trường</span>
+            <span style="font-size: 10px; color: #15803d;">(GPS: 21.0063, 105.8261)</span>
+          `;
+        }
+        switchScreen('submit');
+      }
+      document.querySelectorAll('.tab-item').forEach(item => {
+        item.addEventListener('click', () => {
+          switchScreen(item.dataset.screen);
+        });
+      });
+      document.getElementById('bottomNav').style.display = 'none';
+    </script>
+  </body>
+</html>

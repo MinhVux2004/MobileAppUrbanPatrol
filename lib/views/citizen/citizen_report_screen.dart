@@ -5,31 +5,25 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.h';
-
+import 'package:flutter/foundation.dart';
 class CitizenReportScreen extends StatefulWidget {
   const CitizenReportScreen({super.key});
-
   @override
   State<CitizenReportScreen> createState() => _CitizenReportScreenState();
 }
-
 class _CitizenReportScreenState extends State<CitizenReportScreen> {
   bool _isSending = false;
-  File? _imageFile;
+  XFile? _imageFile; 
+  Uint8List? _imageBytes; 
   Position? _currentPosition;
   String _addressStatus = "Chưa lấy được định vị GPS";
   final TextEditingController _descController = TextEditingController();
   bool _isLoading = false;
-
-  // 1. Hàm tính mã băm SHA-256 từ file ảnh (chống giả mạo)
-  Future<String> _calculateImageHash(File imageFile) async {
+  Future<String> _calculateImageHash(XFile imageFile) async {
     final bytes = await imageFile.readAsBytes();
     final digest = sha256.convert(bytes);
     return digest.toString();
   }
-
-  // 2. Hàm tạo metadata (GPS, thiết bị, thời gian)
   Map<String, dynamic> _generateMetadata({
     required double latitude,
     required double longitude,
@@ -37,35 +31,32 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
     return {
       'latitude': latitude,
       'longitude': longitude,
-      'deviceInfo': Platform.operatingSystem,
+      'deviceInfo': kIsWeb ? 'Web Browser' : Platform.operatingSystem,
       'capturedAt': DateTime.now().toIso8601String(),
     };
   }
-
   Future<void> _captureImageFromCamera() async {
     final ImagePicker picker = ImagePicker();
     final XFile? photo = await picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 80,
     );
-
     if (!mounted) return;
-
     if (photo != null) {
+      final bytes = await photo.readAsBytes();
       setState(() {
-        _imageFile = File(photo.path);
+        _imageFile = photo; 
+        _imageBytes = bytes;
       });
       await _getCurrentLocation();
     }
   }
-
   Future<void> _getCurrentLocation() async {
     if (!mounted) return;
     setState(() {
       _isLoading = true;
       _addressStatus = "Đang khóa định vị GPS...";
     });
-
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!mounted) return;
@@ -76,7 +67,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
         });
         return;
       }
-
       LocationPermission permission = await Geolocator.checkPermission();
       if (!mounted) return;
       if (permission == LocationPermission.denied) {
@@ -90,7 +80,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
           return;
         }
       }
-
       if (permission == LocationPermission.deniedForever) {
         if (!mounted) return;
         setState(() {
@@ -99,11 +88,9 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
         });
         return;
       }
-
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-
       if (!mounted) return;
       setState(() {
         _currentPosition = position;
@@ -118,29 +105,20 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
       });
     }
   }
-
-  // 3. Hàm xử lý gửi báo cáo chính thức
   Future<void> _submitReport() async {
     if (_imageFile == null || _currentPosition == null || _isSending) return;
 
     setState(() {
       _isSending = true;
     });
-
     try {
-      List<int> imageBytes = await _imageFile!.readAsBytes();
+      List<int> imageBytes = _imageBytes ?? await _imageFile!.readAsBytes();
       String base64Image = base64Encode(imageBytes);
-
-      // Tính mã băm SHA-256
       String imageHash = await _calculateImageHash(_imageFile!);
-
-      // Tạo metadata chuẩn
       Map<String, dynamic> metadata = _generateMetadata(
         latitude: _currentPosition!.latitude,
         longitude: _currentPosition!.longitude,
       );
-
-      // Đẩy dữ liệu lên Firestore
       await FirebaseFirestore.instance.collection('reports').add({
         'image_base64': base64Image,
         'image_hash': imageHash,
@@ -151,7 +129,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
         'status': 'Chờ xử lý',
         'metadata': metadata,
       });
-
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -160,9 +137,9 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-
       setState(() {
         _imageFile = null;
+        _imageBytes = null;
         _currentPosition = null;
         _addressStatus = "Chưa lấy được định vị GPS";
         _descController.clear();
@@ -184,7 +161,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -203,8 +179,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Khu vực hiển thị ảnh hiện trường (Đã xử lý an toàn cho Web & Mobile)
             InkWell(
               onTap: _captureImageFromCamera,
               borderRadius: BorderRadius.circular(16),
@@ -222,18 +196,15 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
                     ),
                   ],
                 ),
-                child: _imageFile != null
+                child: _imageBytes != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: kIsWeb
-                            ? Image.network(
-                                _imageFile!.path,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.file(
-                                _imageFile!,
-                                fit: BoxFit.cover,
-                              ),
+                        child: Image.memory(
+                          _imageBytes!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -261,8 +232,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Thẻ hiển thị tọa độ GPS
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
@@ -309,8 +278,6 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Nhập mô tả sự cố
             TextField(
               controller: _descController,
               maxLines: 4,
@@ -335,12 +302,10 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Nút gửi phản ánh
             SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: (_imageFile != null && _currentPosition != null && !_isSending)
+                onPressed: (_imageBytes != null && _currentPosition != null && !_isSending)
                     ? _submitReport
                     : null,
                 style: ElevatedButton.styleFrom(
