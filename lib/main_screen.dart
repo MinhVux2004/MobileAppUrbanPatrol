@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Thêm import FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'views/citizen/citizen_report_screen.dart';
 import 'views/citizen/report_list_screen.dart';
 import 'map_screen.dart';
+import 'profile_screen.dart'; // <--- 1. Thêm import file chứa ProfileScreen của bạn vào đây
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -23,15 +24,26 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Thêm AppBar chung cho các tab để có chỗ đặt nút Đăng xuất
       appBar: AppBar(
         title: const Text('UrbanPatrol - Quản lý sự cố'),
         actions: [
+          // <--- 2. Thêm nút mở trang Thông tin cá nhân ở đây
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Thông tin cá nhân',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
+          
+          // Nút Đăng xuất cũ của bạn
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Đăng xuất',
             onPressed: () async {
-              // Hiển thị hộp thoại xác nhận trước khi đăng xuất
               bool? confirm = await showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -51,9 +63,7 @@ class _MainScreenState extends State<MainScreen> {
               );
 
               if (confirm == true) {
-                // Thực hiện đăng xuất khỏi Firebase
                 await FirebaseAuth.instance.signOut();
-                // Nhờ có StreamBuilder ở main.dart, ứng dụng sẽ tự động chuyển về LoginScreen ngay lập tức!
               }
             },
           ),
