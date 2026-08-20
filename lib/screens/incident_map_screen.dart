@@ -25,7 +25,7 @@ class _IncidentMapScreenState extends State<IncidentMapScreen> {
       final data = doc.data();
       final double? lat = data['latitude'];
       final double? lng = data['longitude'];
-      final String category = data['category'] ?? 'Sự cố';
+      final String category = data['category'] ?? ' cố';
       final String incidentId = doc.id;
       if (lat != null && lng != null) {
         loadedMarkers.add(
